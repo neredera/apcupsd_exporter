@@ -23,7 +23,8 @@ Usage of ./apcupsd_exporter:
 
 ## Sample Docker Usage
 
-apcupsd has to be installed and accessible from the docker container.
+apcupsd has to be accessible from the docker container.
+It can be running on docker as well, e.g. [gersilex/apcupsd-docker](https://github.com/gersilex/apcupsd-docker)
 
 Example `docker-compose.yml`:
 ```
@@ -32,7 +33,31 @@ version: '3.4'
 services:
   apcupsd_exporter:
     image: neredera/apcupsd_exporter:latest
-    command: "-apcupsd.addr nishost.domain.local:3551"
+    restart: always
+    command: "-apcupsd.addr apcupsd:3551"
     ports:
       - 9162:9162
+    networks:
+      - apcupsd
+      - prometheus
+
+  apcupsd:
+    image: gersilex/apcupsd:v1
+    restart: always
+    tty: true
+    devices:
+      - /dev/usb/hiddev0:/dev/usb/hiddev0
+    volumes:
+      - ./apcupsd.conf:/etc/apcupsd/apcupsd.conf
+    ports:
+      - 3551:3551
+    networks:
+      - apcupsd
+
+networks:
+  apcupsd:
+  prometheus: # prometheus network (for access to apcupsd_exporter).
+    external:
+      name: prometheus
+    
 ```
