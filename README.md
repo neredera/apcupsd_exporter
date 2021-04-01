@@ -20,3 +20,19 @@ Usage of ./apcupsd_exporter:
   -telemetry.path string
         URL path for surfacing collected metrics (default "/metrics")
 ```
+
+## Sample Docker Usage
+
+apcupsd has to be installed and accessible from the docker container.
+
+Example `docker-compose.yml`:
+```
+version: '3.4'
+
+services:
+  apcupsd_exporter:
+    image: neredera/apcupsd_exporter:latest
+    command: "-apcupsd.addr nishost.domain.local:3551"
+    ports:
+      - 9162:9162
+```
